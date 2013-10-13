@@ -88,6 +88,17 @@ WHERE
     repository_language='Go'
 GROUP BY month
 ORDER BY month DESC
+
+/* master pushers: Top 100 users by how many people push to master on the repos they own */
+SELECT repository_owner, count(DISTINCT repository_name) as repos, count(DISTINCT actor) as pushers
+FROM [githubarchive:github.timeline]
+WHERE type == "PushEvent"
+   AND PARSE_UTC_USEC(created_at) >= PARSE_UTC_USEC("2013-09-01 00:00:00")
+   AND PARSE_UTC_USEC(created_at) < PARSE_UTC_USEC("2013-10-01 00:00:00")
+   AND payload_ref = "refs/heads/master"
+GROUP BY repository_owner
+ORDER BY pushers DESC
+LIMIT 100
 ```
 
 For full schema of available fields to select, order, and group by, see schema.js.
